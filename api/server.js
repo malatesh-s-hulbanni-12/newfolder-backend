@@ -6,17 +6,31 @@ const Data = require('../models/Data');
 
 const app = express();
 
-// ------------------ CORS FIX ------------------
+/* ================== CORS CONFIG ================== */
+const allowedOrigins = [
+  'http://localhost:5173', // local frontend (Vite)
+  'http://localhost:3000', // local React
+  'https://newfoldre-frontend.vercel.app'
+];
+
 app.use(cors({
-  origin: [
-    'https://newfoldre-frontend-1rtf.vercel.app'
-  ],
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 
 app.use(express.json());
 
-// ------------------ MONGODB CACHE FIX ------------------
+/* ================== MONGODB CONNECTION CACHE ================== */
+
 let cached = global.mongoose;
 
 if (!cached) {
@@ -38,7 +52,7 @@ async function connectDB() {
 
 connectDB();
 
-// ------------------ ROUTES ------------------
+/* ================== ROUTES ================== */
 
 app.post('/api/data', async (req, res) => {
   try {
@@ -64,6 +78,7 @@ app.post('/api/data', async (req, res) => {
     });
 
   } catch (error) {
+    console.error("POST Error:", error);
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -83,6 +98,7 @@ app.get('/api/data', async (req, res) => {
     });
 
   } catch (error) {
+    console.error("GET Error:", error);
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -99,4 +115,5 @@ app.get('/', (req, res) => {
   });
 });
 
+/* ================== EXPORT ================== */
 module.exports = app;
