@@ -9,7 +9,7 @@ const app = express();
 // ------------------ CORS FIX ------------------
 app.use(cors({
   origin: [
-    'https://newfoldre-frontend.vercel.app'
+    'https://newfoldre-frontend-1rtf.vercel.app'
   ],
   credentials: true
 }));
